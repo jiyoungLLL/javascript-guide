@@ -70,17 +70,25 @@ html,body{height:100%}
 .drawer-backdrop{
   display:none;
   position:absolute;inset:0;
-  background:rgba(0,0,0,0.25);
+  background:rgba(0,0,0,0.35);
   z-index:20;
+  /* block all touch/pointer events on the content behind */
+  pointer-events:none;
 }
-.drawer-backdrop.open{display:block}
+.drawer-backdrop.open{
+  pointer-events:all;
+  touch-action:none;
+}
+.drawer-backdrop.open{display:block;}
 
 /* ── Drawer — slides in from the left ────── */
 .drawer{
   position:absolute;
   left:0;top:0;bottom:0;
   width:min(82vw,300px);
-  background:var(--c-bg);
+  background:var(--c-bg, #ffffff);
+  /* force solid — never let content bleed through */
+  background-color:var(--c-bg, #ffffff);
   border-right:0.5px solid var(--c-border);
   z-index:30;
   transform:translateX(-100%);
@@ -766,11 +774,17 @@ function openDrawer(){
   drawerOpen=true;
   document.getElementById('drawer').classList.add('open');
   document.getElementById('backdrop').classList.add('open');
+  // prevent main content from scrolling while drawer is open
+  const main=document.getElementById('main-content');
+  if(main){main._scrollTop=main.scrollTop;main.style.overflow='hidden';}
 }
 function closeDrawer(){
   drawerOpen=false;
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('backdrop').classList.remove('open');
+  // restore main scroll
+  const main=document.getElementById('main-content');
+  if(main){main.style.overflow='';main.scrollTop=main._scrollTop||0;}
 }
 
 function buildNav(){
